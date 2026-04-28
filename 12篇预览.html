@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>烟火有味 · 12 篇预览（模拟小红书）</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  background: #f5f5f5;
+  color: #222;
+  line-height: 1.55;
+}
+
+/* ---------- Top nav ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: #fff; border-bottom: 1px solid #ececec;
+  padding: 12px 24px; display: flex; align-items: center; gap: 24px;
+}
+.logo { font-weight: 800; font-size: 22px; color: #ff2741; letter-spacing: 0.5px; }
+.search {
+  flex: 1; max-width: 480px; background: #f5f5f5; border-radius: 22px;
+  padding: 8px 18px; color: #888; font-size: 13px;
+}
+
+/* ---------- Account banner ---------- */
+.banner {
+  background: #fff; padding: 28px 32px; margin: 16px auto 8px; max-width: 1200px;
+  border-radius: 12px; display: flex; gap: 24px; align-items: flex-start;
+}
+.avatar {
+  width: 88px; height: 88px; border-radius: 50%;
+  background: linear-gradient(135deg, #2a2a2a, #555);
+  display: flex; align-items: center; justify-content: center;
+  color: #f0d090; font-size: 13px; font-weight: 600; flex-shrink: 0;
+  box-shadow: 0 0 0 3px #fff, 0 0 0 4px #eee;
+}
+.account-info h1 { font-size: 22px; margin-bottom: 6px; }
+.account-bio { color: #888; font-size: 14px; margin-bottom: 12px; }
+.stats { display: flex; gap: 24px; font-size: 13px; color: #555; }
+.stats b { color: #222; font-size: 16px; margin-right: 4px; }
+
+/* ---------- Tab bar ---------- */
+.tabs {
+  max-width: 1200px; margin: 0 auto; padding: 12px 32px;
+  display: flex; gap: 28px; border-bottom: 1px solid #ececec;
+  background: #fff; border-radius: 0;
+}
+.tab { font-size: 15px; color: #888; cursor: pointer; padding: 6px 0; position: relative; }
+.tab.active { color: #222; font-weight: 600; }
+.tab.active::after {
+  content: ""; position: absolute; bottom: -13px; left: 50%; transform: translateX(-50%);
+  width: 24px; height: 3px; background: #ff2741; border-radius: 2px;
+}
+
+/* ---------- Waterfall grid ---------- */
+.feed {
+  max-width: 1200px; margin: 16px auto; padding: 0 16px;
+  column-count: 4; column-gap: 12px;
+}
+@media (max-width: 1100px) { .feed { column-count: 3; } }
+@media (max-width: 760px)  { .feed { column-count: 2; padding: 0 8px; } }
+
+.card {
+  break-inside: avoid; background: #fff; border-radius: 12px; overflow: hidden;
+  margin-bottom: 12px; cursor: pointer; transition: transform 0.18s ease;
+}
+.card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+
+.cover {
+  width: 100%; position: relative; display: flex; align-items: center; justify-content: center;
+  padding: 16px; color: #fff; font-weight: 600; text-align: center;
+  background-size: cover; background-position: center;
+  overflow: hidden;
+}
+.cover .real-img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0; transition: opacity 0.3s; z-index: 0;
+}
+.cover .real-img.loaded { opacity: 1; }
+.cover .real-img.loaded ~ .placeholder-text { display: none; }
+.cover .cat-tag {
+  position: absolute; top: 8px; left: 8px; z-index: 2;
+  background: rgba(0,0,0,0.55); color: #fff; padding: 3px 8px;
+  border-radius: 8px; font-size: 11px; font-weight: 500;
+}
+.cover .ratio-tag {
+  position: absolute; top: 8px; right: 8px; z-index: 2;
+  background: rgba(255,255,255,0.85); color: #333; padding: 3px 8px;
+  border-radius: 8px; font-size: 11px; font-weight: 500;
+}
+.cover .placeholder-text {
+  font-size: 13px; opacity: 0.92; line-height: 1.5;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  z-index: 1; position: relative;
+}
+.cover.r23 { aspect-ratio: 2/3; }
+.cover.r32 { aspect-ratio: 3/2; }
+.cover.r11 { aspect-ratio: 1/1; }
+
+.card-body { padding: 10px 12px 14px; }
+.card-title {
+  font-size: 14px; font-weight: 500; color: #222;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; line-height: 1.45;
+}
+.card-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 8px; font-size: 12px; color: #888;
+}
+.card-author { display: flex; align-items: center; gap: 6px; }
+.card-author .mini-ava {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: linear-gradient(135deg, #2a2a2a, #555);
+}
+.card-likes { display: flex; align-items: center; gap: 3px; }
+
+/* ---------- Modal (detail view) ---------- */
+.modal-mask {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: none; z-index: 100; padding: 32px;
+  overflow-y: auto;
+}
+.modal-mask.show { display: flex; align-items: flex-start; justify-content: center; }
+.modal {
+  width: 100%; max-width: 1100px; background: #fff; border-radius: 16px;
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  overflow: hidden; min-height: 600px; position: relative;
+  margin: auto;
+}
+@media (max-width: 880px) {
+  .modal { grid-template-columns: 1fr; }
+}
+.modal-close {
+  position: absolute; top: 12px; right: 12px; z-index: 5;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(0,0,0,0.5); color: #fff; border: none;
+  font-size: 18px; cursor: pointer; line-height: 30px;
+}
+
+.image-pane {
+  background: #000; position: relative;
+  min-height: 600px; align-self: stretch;
+  display: flex; align-items: stretch; justify-content: center;
+}
+#slidesContainer {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.slide {
+  position: absolute; inset: 0;
+  display: none; padding: 24px;
+  align-items: center; justify-content: center; flex-direction: column;
+  color: #fff; text-align: center;
+  box-sizing: border-box;
+}
+.slide.active { display: flex; }
+.slide-inner {
+  background: #111;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  width: 100%;
+}
+.slide-inner .real-img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0; transition: opacity 0.3s; z-index: 0;
+  border-radius: 8px;
+}
+.slide-inner .real-img.loaded { opacity: 1; }
+.slide-inner .real-img.loaded ~ .slide-prompt { display: none; }
+.slide-inner.r23 { aspect-ratio: 2/3; max-width: min(420px, calc((100vh - 200px) * 2/3)); }
+.slide-inner.r32 { aspect-ratio: 3/2; max-width: min(620px, calc((100vh - 200px) * 3/2)); }
+.slide-inner.r11 { aspect-ratio: 1/1; max-width: min(540px, calc(100vh - 200px)); }
+.slide-label {
+  position: absolute; top: 12px; left: 12px; z-index: 2;
+  background: rgba(255,255,255,0.85); color: #333;
+  padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;
+}
+.slide-ratio-label {
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  background: rgba(0,0,0,0.55); color: #fff;
+  padding: 4px 10px; border-radius: 12px; font-size: 12px;
+}
+.slide-prompt {
+  font-size: 13px; line-height: 1.65; color: rgba(255,255,255,0.95);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  max-width: 90%; padding: 24px; z-index: 1;
+}
+
+.nav-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,0.9); border: none; cursor: pointer;
+  font-size: 22px; color: #333; z-index: 4;
+}
+.nav-btn.prev { left: 16px; }
+.nav-btn.next { right: 16px; }
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.dots {
+  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 4;
+}
+.dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.5); cursor: pointer; transition: background 0.2s;
+}
+.dot.active { background: #fff; }
+
+.content-pane {
+  padding: 28px 32px; display: flex; flex-direction: column;
+  max-height: 800px; overflow-y: auto;
+}
+.detail-author {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  padding-bottom: 16px; border-bottom: 1px solid #f0f0f0;
+}
+.detail-author .mini-ava { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #2a2a2a, #555); }
+.detail-author-info b { display: block; font-size: 14px; }
+.detail-author-info span { font-size: 12px; color: #888; }
+
+.detail-title {
+  font-size: 18px; font-weight: 700; line-height: 1.45; margin-bottom: 14px;
+}
+.detail-body {
+  white-space: pre-wrap; font-size: 14px; line-height: 1.85; color: #333;
+  margin-bottom: 16px;
+}
+.detail-tags {
+  display: flex; flex-wrap: wrap; gap: 6px 8px; padding-top: 8px;
+  border-top: 1px solid #f0f0f0; margin-top: 8px;
+}
+.tag {
+  background: #f6f8fb; color: #5170b8; font-size: 12px;
+  padding: 4px 10px; border-radius: 12px;
+}
+
+.detail-meta {
+  display: flex; gap: 14px; align-items: center;
+  font-size: 12px; color: #888; margin-top: 16px;
+  padding-top: 12px; border-top: 1px solid #f0f0f0;
+}
+.detail-actions {
+  margin-top: auto; padding-top: 16px; display: flex;
+  gap: 16px; align-items: center; border-top: 1px solid #f0f0f0;
+}
+.detail-actions .action {
+  display: flex; align-items: center; gap: 4px; color: #888;
+  font-size: 13px; cursor: pointer;
+}
+
+.notice {
+  background: #fffbe6; border: 1px solid #ffe58f; border-radius: 8px;
+  padding: 8px 12px; font-size: 12px; color: #876800; margin-bottom: 14px;
+}
+
+/* ---------- Comment section ---------- */
+.comment-section {
+  margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0f0f0;
+}
+.comment-title {
+  font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #333;
+}
+.comment-list {
+  display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;
+}
+.comment-item {
+  background: #f8f9fa; border-radius: 8px; padding: 10px 12px;
+  font-size: 13px; line-height: 1.6; color: #333; position: relative;
+}
+.comment-item .comment-time {
+  font-size: 11px; color: #aaa; margin-top: 4px;
+}
+.comment-item .comment-delete {
+  position: absolute; top: 8px; right: 10px;
+  font-size: 12px; color: #ccc; cursor: pointer; border: none; background: none;
+}
+.comment-item .comment-delete:hover { color: #ff4d4f; }
+.comment-input-wrap {
+  display: flex; gap: 8px; align-items: flex-end;
+}
+.comment-input {
+  flex: 1; border: 1px solid #e0e0e0; border-radius: 8px;
+  padding: 8px 12px; font-size: 13px; resize: vertical;
+  font-family: inherit; line-height: 1.5;
+}
+.comment-input:focus { outline: none; border-color: #5170b8; }
+.comment-submit {
+  background: #222; color: #fff; border: none; border-radius: 8px;
+  padding: 8px 16px; font-size: 13px; cursor: pointer; white-space: nowrap;
+}
+.comment-submit:hover { background: #444; }
+
+/* category colors for placeholder cover */
+.cover[data-cat="烟知识"] { background: linear-gradient(135deg, #3a2a1a, #6b4a2a, #8a6438); }
+.cover[data-cat="节令"]   { background: linear-gradient(135deg, #4a5a3a, #6b8a5a, #8da868); }
+.cover[data-cat="旅游"]   { background: linear-gradient(135deg, #2a3a4a, #4a6a8a, #6a8aa8); }
+
+.slide-inner[data-cat="烟知识"] { background: linear-gradient(135deg, #3a2a1a, #6b4a2a, #8a6438); }
+.slide-inner[data-cat="节令"]   { background: linear-gradient(135deg, #4a5a3a, #6b8a5a, #8da868); }
+.slide-inner[data-cat="旅游"]   { background: linear-gradient(135deg, #2a3a4a, #4a6a8a, #6a8aa8); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">小红书 RED</div>
+  <div class="search">🔍 烟火有味</div>
+  <div style="font-size: 13px; color:#888;">11 篇预览模式</div>
+  <button onclick="exportComments()" style="margin-left:auto;background:#222;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;">导出全部备注</button>
+</div>
+
+<div class="banner">
+  <div class="avatar">烟火<br>有味</div>
+  <div class="account-info">
+    <h1>烟火有味</h1>
+    <div class="account-bio">人间烟火，自有味道 | 探索贵州风味的无限可能</div>
+    <div class="stats">
+      <div><b>1940</b>粉丝</div>
+      <div><b>3538</b>赞与收藏</div>
+      <div><b>10+11</b>笔记（已发 + 待发）</div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active">本周 11 篇预览</div>
+  <div class="tab" style="opacity:0.5; cursor:not-allowed;">已发笔记（10）</div>
+  <div class="tab" style="opacity:0.5; cursor:not-allowed;">收藏</div>
+</div>
+
+<div class="feed" id="feed"></div>
+
+<!-- Detail modal -->
+<div class="modal-mask" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="image-pane">
+      <button class="nav-btn prev" id="prevBtn" onclick="navSlide(-1)">‹</button>
+      <button class="nav-btn next" id="nextBtn" onclick="navSlide(1)">›</button>
+      <div id="slidesContainer"></div>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div class="content-pane">
+      <div class="detail-author">
+        <div class="mini-ava"></div>
+        <div class="detail-author-info">
+          <b>烟火有味</b>
+          <span>2026-04-XX · 贵州</span>
+        </div>
+      </div>
+      <div class="notice" id="notice" style="display:none;"></div>
+      <h2 class="detail-title" id="dTitle"></h2>
+      <div class="detail-body" id="dBody"></div>
+      <div class="detail-tags" id="dTags"></div>
+      <div class="detail-meta" id="dMeta"></div>
+      <div class="detail-actions">
+        <span class="action">❤️ 点赞</span>
+        <span class="action">⭐️ 收藏</span>
+        <span class="action">💬 评论</span>
+        <span class="action">↗ 分享</span>
+      </div>
+      <div class="comment-section">
+        <h3 class="comment-title">审稿备注</h3>
+        <div class="comment-list" id="commentList"></div>
+        <div class="comment-input-wrap">
+          <textarea class="comment-input" id="commentInput" placeholder="写备注：图片问题、文字问题…" rows="2"></textarea>
+          <button class="comment-submit" onclick="addComment()">提交</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const POSTS = [
+  {
+    id: 1, cat: "烟知识",
+    title: "【黔地识烟志③】贵烟跨越——为什么它叫\"跨越\"",
+    coverRatio: "r23", coverPrompt: "黑底星芒包装｜陈皮爆珠｜90mm 细支｜栏目第三期",
+    likes: "拟 200+",
+    notice: "✦ 严格不出现\"30 年\"陈皮字样（公开资料未确认年份）",
+    body: `开了「黔地识烟志」这个坑之后，
+第一期聊魔力，第二期我去补了点功课，
+第三期，回到这支等了很久的——贵烟（跨越）
+
+为什么叫"跨越"？
+
+它的官方传播语原话是这样的：
+"跨越，是一种积极向上的人生态度，
+是在逆境中勇敢者的选择，是前行途中自信的抉择"
+——这名字不是随便起的，是把一种"往前走"的劲儿写在烟上
+
+🌌 先看包装
+黑底+浅灰，第一眼像太空
+中间一颗"星芒"图案，是它的视觉记忆点
+"贵烟"两个字烫金，凹凸的，手指摸过去能感觉到
+官方原话："那深邃的黑，犹如无涯的太空"
+"那浅浅的灰，恰似浩瀚的银河星光点点"
+所以包装语言其实是——黑像太空，灰像银河
+
+🍊 再看工艺
+90mm 细支，焦油 7mg，烟碱 0.8mg
+滤嘴里嵌一颗陈皮爆珠
+不捏珠：抽到的是浓郁纯和的烟草本香
+捏破珠：橘子的清香 + 一点点药香慢慢渗出来
+（陈皮性温味苦，理气健脾、燥湿化痰，老一辈知道）
+
+🌱 烟叶是贵州本地的喀斯特烟叶
+高海拔、云雾多、昼夜温差大
+养出来的烟叶有股清润的木香
+跟陈皮爆珠的橘香药香，气质是同一路——沉、慢、有回甘
+
+参数上属低焦细支
+适合喜欢节奏慢一点的朋友
+也适合懂陈皮的人尝个新鲜
+最适合当贵州伴手礼了
+
+—
+下期预告：聊聊烟支长度——60mm vs 84mm vs 90mm 差在哪`,
+    tags: ["#黔地识烟志", "#贵烟跨越", "#贵州烟", "#陈皮爆珠", "#细支烟", "#贵州伴手礼", "#烟草文化", "#每天认识一款烟"],
+    images: [
+      { ratio: "r23", label: "P1 封面", prompt: "贵烟跨越黑色烟盒（星芒图案）｜木桌面，旁有陶瓷茶杯、报纸折角、铜质打火机｜iPhone 随手拍质感，不要 AI 渲染感，自然光线不均匀，桌面有使用痕迹" },
+      { ratio: "r23", label: "P2 信息卡", prompt: "复古笔记本平铺木桌｜手写中文「跨越——逆境中勇敢者的选择」+ 简笔星芒｜咖啡渍 + 钢笔｜iPhone 随手拍质感，不要 AI 渲染感，自然光线不均匀，桌面有使用痕迹" },
+      { ratio: "r23", label: "P3 参数卡", prompt: "亚麻布上 4 张牛皮纸卡 2x2 排列｜手写「90mm 细支 / 焦油 7mg / 烟碱 0.8mg / 陈皮爆珠」｜旁有陈皮、麻绳、蓝瓷小碟｜iPhone 随手拍质感，不要 AI 渲染感，自然光线不均匀，桌面有使用痕迹" },
+      { ratio: "r23", label: "P4 包装语言", prompt: "贵烟跨越黑色烟盒一角侧光｜放大镜置于其上，可见烫金「贵烟」二字｜深木纹背景｜iPhone 随手拍质感，不要 AI 渲染感，自然光线不均匀，桌面有使用痕迹" },
+      { ratio: "r23", label: "P5 风味收尾", prompt: "白瓷小盘 + 一片陈皮｜旁有冒着热气的小黑陶茶杯｜半开的书、毛衣袖口、午后窗帘｜iPhone 随手拍质感，不要 AI 渲染感，自然光线不均匀" }
+    ]
+  },
+  {
+    id: 2, cat: "烟知识",
+    title: "一支烟的长度也有讲究？60mm vs 84mm vs 90mm 差在哪",
+    coverRatio: "r11", coverPrompt: "三种长度并排｜剪影对比｜列表科普",
+    likes: "拟 150+",
+    body: `最近有朋友问我：
+"贵烟里魔力是 60mm，跨越是 90mm，
+中间还有 84mm 的常规款，到底差在哪？"
+专门做了功课，把烟支长度这事儿讲清楚 👇
+
+📏 60mm 超细支（魔力是这个长度）
+最细最短，烟支直径也细
+特点：吸阻轻、节奏快
+一支抽下来时间短，适合"碎片时间一支"
+风味偏细腻，烟丝量少所以风味更聚焦
+适合：节奏快的人、女性消费者、社交场合短停留
+
+📏 84mm 常规中支（行业经典款）
+直径正常，长度也是大多数烟的"标准答案"
+特点：风味饱满、节奏稳
+烟丝量足，吸阻均衡，市面上 80% 的烟都是这个尺寸
+风味展开充分，从前段到尾段层次完整
+适合：习惯传统中支的老烟民
+
+📏 90mm 细支（跨越是这个长度）
+直径细但长度比 60mm 多 30mm
+特点：吸阻细腻、节奏慢
+烟支细所以每口烟气量小，但 90mm 给了足够的"展开时间"
+能慢慢抽出层次——前段、中段、尾段都有不同感受
+适合：喜欢"慢烟"的人、独处时段、想一支抽久一点
+
+⚠️ 重要的事说三遍：
+长度选的是节奏，不是高低
+长度选的是节奏，不是高低
+长度选的是节奏，不是高低
+
+不存在"哪种长度更好"
+只有"哪种长度更适合你的节奏"
+
+📌 一句话总结
+快节奏选 60，传统选 84，慢节奏选 90
+
+下期聊：同样是细支，60 和 90 抽起来差多少（已经在做了）`,
+    tags: ["#贵烟", "#细支烟", "#烟草知识", "#贵烟魔力", "#贵烟跨越", "#黔地识烟志", "#贵州伴手礼", "#每天认识一款烟"],
+    images: [
+      { ratio: "r11", label: "P1 封面", prompt: "三支抽象铅笔状物体｜不同长度并排平铺亚麻｜下方淡淡尺刻度｜iPhone 随手拍质感，不要 AI 渲染感，自然光线不均匀，桌面有使用痕迹" },
+      { ratio: "r11", label: "P2 60mm 场景", prompt: "晨间桌面｜半空咖啡杯、面朝下手机、笔记本一行字｜烟灰缸边缘有支细长物（60mm 暗示）｜iPhone 随手拍质感，不要 AI 渲染感，自然光线不均匀，桌面有使用痕迹" },
+      { ratio: "r11", label: "P3 84mm 场景", prompt: "傍晚桌面｜旧皮笔记本翻开手写、金属打火机、小陶烟缸｜旁有圆柱状物体｜iPhone 随手拍质感，不要 AI 渲染感，自然光线不均匀，桌面有使用痕迹" },
+      { ratio: "r11", label: "P4 90mm 场景", prompt: "深夜慢场景｜木茶盘 + 黑陶壶 + 一杯茶｜半读的书面朝下｜长细圆柱物在茶盘边｜iPhone 随手拍质感，不要 AI 渲染感，自然光线不均匀" },
+      { ratio: "r11", label: "P5 总结卡", prompt: "横线纸手写中文「长度选的是节奏，不是高低」｜钢笔、咖啡渍、一片陈皮｜iPhone 随手拍质感，不要 AI 渲染感，自然光线不均匀" }
+    ]
+  },
+  {
+    id: 11, cat: "烟知识",
+    title: "一颗陈皮爆珠是怎么塞进滤嘴的？拆 5 步给你看",
+    coverRatio: "r23", coverPrompt: "5 步流程｜从橘皮到爆珠｜工艺科普",
+    likes: "拟 130+",
+    notice: "✦ 工艺细节客户档案需校验，文案以\"行业通用逻辑\"写，不出现具体厂家工艺数字",
+    body: `上次写陈皮系列，有朋友评论说：
+"陈皮我懂，可它怎么变成爆珠的？"
+今天把这 5 步讲清楚——从橘皮到滤嘴里那颗小珠子 👇
+
+🍊 第 1 步：选皮
+不是所有橘皮都能做陈皮爆珠
+贵烟魔力 / 跨越用的是新会陈皮——三晒三藏自然陈化
+新皮鲜亮橘色，老皮深褐近黑
+要做爆珠的陈皮，得先到"陈"那个程度，香气才稳
+
+🧪 第 2 步：超萃
+"超萃"是行业里的专业说法
+简单理解：把陈皮里的有效分子（精油 + 香气物质）
+用低温溶剂萃出来，浓缩成一小份精华液
+这一步关键在"低温"——高温会破坏药香
+
+💊 第 3 步：包膜
+精华液不能直接放进烟里——会渗
+要用食品级胶囊技术做一层薄薄的"壳"
+里面是液态陈皮精华，外面是脆膜
+这跟感冒药胶囊原理类似，但壳的脆度不一样
+要捏才会破，但放着不会自己漏
+
+🎯 第 4 步：嵌入滤棒
+滤棒不是单纯的"白色海绵"
+贵烟魔力用的是"三元空腔滤棒"——
+就是滤棒里有三段：醋纤段、空腔段、爆珠段
+爆珠在中段位置（不是最靠近嘴的）
+位置精度要求很高，差 1mm 抽起来感觉就变了
+
+📦 第 5 步：整支封装
+最后是把烟丝、滤棒、纸卷成一支烟
+这一步跟普通烟一样
+但前面 4 步决定了爆珠的质感
+
+📌 一句话总结
+你抽烟时捏破的那 0.5 秒香气
+是橘子在罐子里待了好多年 + 4 步精细工艺一起出的结果
+
+🏷 这个工艺细节有用吗？评论区聊聊`,
+    tags: ["#贵烟", "#陈皮爆珠", "#烟草工艺", "#新会陈皮", "#贵烟魔力", "#贵烟跨越", "#黔地识烟志", "#贵州伴手礼", "#烟草知识"],
+    images: [
+      { ratio: "r23", label: "P1 封面", prompt: "纵向流程图｜上：新鲜橘皮｜中：玻璃烧杯琥珀液｜下：白瓷碟一颗胶囊｜手写铅笔箭头连接｜亚麻背景" },
+      { ratio: "r23", label: "P2 选皮", prompt: "竹托盘上不同陈化阶段陈皮｜从亮橙到深褐｜竹篾 + 折叠纸标签｜午后柔光" },
+      { ratio: "r23", label: "P3 超萃", prompt: "玻璃烧杯琥珀液 + 玻璃滴管｜几片陈皮｜柔光暗示蒸汽｜不冷峻、家庭实验感" },
+      { ratio: "r23", label: "P4 包膜", prompt: "黑天鹅绒上单颗琥珀胶囊微距｜柔光打透半透明壳｜旁镊子、几粒空壳" },
+      { ratio: "r23", label: "P5 嵌入+封装", prompt: "方格纸上手绘剖面图｜滤棒三段、中段嵌胶囊｜钢笔、实物剖面、中文手写注释" }
+    ]
+  },
+  {
+    id: 12, cat: "烟知识",
+    title: "烟里的\"中焦/低焦\"是什么意思？2 款贵烟焦油对比",
+    coverRatio: "r11", coverPrompt: "2 款焦油值对比｜中焦/低焦档位",
+    likes: "拟 120+",
+    notice: "✦ 不能贬低高焦",
+    body: `后台一个老问题：
+"焦油 7mg 跟 8mg 抽起来差很多吗？"
+答案是——差，但差的不只是数字 👇
+
+📏 焦油是什么？
+烟燃烧后留下的焦油颗粒物
+mg 越高 = 越浓郁，但也越冲
+mg 越低 = 越细腻，但满足感稍弱
+（不是健康指标，是风味档位）
+
+🚦 行业分档
+- 高焦：12mg 以上（已基本退市）
+- 中焦：8-12mg
+- 低焦：≤8mg
+- 超低焦：≤5mg
+现在主流都在中焦和低焦之间
+
+📊 2 款贵烟焦油值
+- 魔力：8mg（中焦下限）
+- 跨越：7mg（低焦上限）
+
+🎯 8mg vs 7mg 抽起来差什么？
+
+魔力 8mg：
+风味浓度更高，烟丝层次饱满
+配陈皮爆珠后是"先浓后甜"
+适合追求"满足感"的朋友
+
+跨越 7mg：
+风味更细腻，烟支也更细（90mm vs 60mm）
+配陈皮爆珠后是"细水长流"
+适合追求"慢节奏"的朋友
+
+📌 选焦油看 3 件事
+① 你抽烟的节奏：快 → 中焦 / 慢 → 低焦
+② 你的风味偏好：浓 → 中焦 / 细 → 低焦
+③ 你的场景：社交 → 中焦 / 独处 → 低焦
+
+⚠️ 重要：低焦 ≠ "更健康"
+焦油是风味指标，不是健康指标
+任何吸烟都有健康风险，请理性消费
+（这一段我必须写，不写不合规）`,
+    tags: ["#贵烟", "#烟草知识", "#焦油", "#贵烟魔力", "#贵烟跨越", "#黔地识烟志", "#贵州伴手礼", "#每天认识一款烟"],
+    images: [
+      { ratio: "r11", label: "P1 封面", prompt: "亚麻底 2 张牛皮卡片并排｜手写「8mg / 7mg」｜散落几片烟叶碎｜暖窗光" },
+      { ratio: "r11", label: "P2 焦油是什么", prompt: "复古笔记本一页手写「焦油=烟燃烧后颗粒物」｜放大镜放在页上｜旁小碟深棕颗粒物｜暖桌光" },
+      { ratio: "r11", label: "P3 行业分档", prompt: "横线纸手写图表「高焦 12+ / 中焦 8-12 / 低焦 ≤8 / 超低焦 ≤5」｜从上到下细箭头｜铅笔橡皮" },
+      { ratio: "r11", label: "P4 魔力 vs 跨越", prompt: "左右拼板｜左：深木暖橙调；右：浅米凉琥珀调｜各贴手写「8mg」「7mg」｜浓 vs 细" },
+      { ratio: "r11", label: "P5 cheat sheet", prompt: "牛皮纸手写「节奏快→中焦 / 节奏慢→低焦 / 风味浓→中焦 / 风味细→低焦」｜咖啡渍、钢笔" }
+    ]
+  },
+  {
+    id: 3, cat: "节令",
+    title: "立夏前贵州人都在做的 3 件\"慢事\"",
+    coverRatio: "r23", coverPrompt: "雨后山景｜煮陈皮 + 晒茶 + 等雷雨｜慢时光",
+    likes: "拟 250+",
+    body: `还有几天就立夏（5/5）了
+贵州人这几天在做的 3 件"慢事"
+跟你们分享下 👇
+
+🫖 第 1 件：煮一壶陈皮
+贵州人家里几乎都有一罐陈皮
+立夏前后会拿出来煮一壶
+不是泡——是煮
+水开后扔几片陈皮，转小火，咕嘟 15 分钟
+出来的汤是琥珀色的，喝一口暖到胃里
+立夏湿气重，老人说"陈皮顺气祛湿"
+家里那罐陈皮是前年晒的
+每年舀一次，少一勺
+
+🍃 第 2 件：把茶叶晒一遍
+今年的春茶到立夏前后吸了不少潮气
+贵州人会找个晴天，把茶叶倒在簸箕上
+摊开晒 2-3 小时（不能太久，会过头）
+然后再装回罐子
+这一步叫"透潮"
+做过的茶叶喝起来更"爽"，没有闷味
+雷公山的春茶 / 都匀毛尖都适合这么处理
+
+⛈ 第 3 件：等一场雷雨
+黔东南立夏前后必有一场雷雨
+老人说"雷打立夏，蝉鸣到秋"
+意思是立夏的第一场雷雨打了
+夏天就真正开始
+雷雨过后山里特别清新
+这场雨值得专门等
+
+📌 一句话总结
+贵州的"慢"，不是无所事事
+是顺天气——
+天潮就煮陈皮
+茶旧了就晒一遍
+该来的雨就等
+
+立夏前几天，给自己留点这种"慢时光"
+配一杯陈皮茶或者一支细支烟
+都挺好`,
+    tags: ["#立夏", "#贵州", "#慢时光", "#节气生活", "#陈皮茶", "#春茶", "#雷公山", "#都匀毛尖", "#贵州伴手礼", "#黔东南"],
+    images: [
+      { ratio: "r23", label: "P1 封面", prompt: "贵州乡村雨后下午｜传统木屋 + 远山雾绿 + 雨后石板路｜雷雨前低暖光｜慢、呼吸感" },
+      { ratio: "r23", label: "P2 煮陈皮", prompt: "深陶小壶在小火炉上｜陈皮蒸气｜玻璃罐 + 木勺 + 茶杯｜厨房窗光，暖琥珀" },
+      { ratio: "r23", label: "P3 晒茶", prompt: "竹簸箕铺开茶叶｜阳台木地板｜侧光柔影｜一双劳作手轻轻翻动（仅边缘）" },
+      { ratio: "r23", label: "P4 等雷雨", prompt: "远山乌云聚集｜前景小木屋窗光｜风暴前戏剧光不刺眼｜冷暖混合｜不奇幻" },
+      { ratio: "r23", label: "P5 收尾静物", prompt: "木茶盘 + 黑陶壶 + 两只小白瓷杯琥珀茶｜陈皮 + 半开诗集面朝下｜窗光柔｜慢" }
+    ]
+  },
+  {
+    id: 9, cat: "节令",
+    title: "立夏后贵州山里的茶，味道变了——3 个泡法窍门",
+    coverRatio: "r23", coverPrompt: "立夏后茶汤｜春茶变夏茶｜泡法升级",
+    likes: "拟 200+",
+    body: `谷雨那期我写了"陈皮春茶怎么泡"
+后台不少人问：立夏过了，茶咋办？
+
+立夏（5/5）一过，贵州山里的茶就变了
+春茶变夏茶，味道差挺多的
+今天把 3 个窍门讲清楚 👇
+
+🍃 立夏前后茶差什么？
+
+立夏前（春茶）：
+- 嫩芽多，氨基酸高
+- 鲜爽度强，回甘明显
+- 适合 70℃ 温水，30 秒出汤
+
+立夏后（夏茶）：
+- 茶多酚高，咖啡因高
+- 苦味重，鲜爽度下降
+- 必须换泡法，否则苦得没法喝
+
+🌡 窍门 1：水温从 70℃ → 85℃
+夏茶氨基酸少了，温水泡出来的鲜味出不来
+要用 85℃ 左右的水
+但也别超过 90℃，否则苦味会爆发
+
+⏱ 窍门 2：出汤从 30s → 15s
+夏茶茶多酚高，泡久了苦味直接出来
+出汤要快——15 秒就够了
+头道汤倒掉，第二道开始喝
+
+🍊 窍门 3：配陈皮的方式也要变
+春茶 + 老陈皮 = 鲜+醇 (是经典)
+夏茶 + 嫩陈皮 = 苦+清香 (也好)
+夏茶用嫩陈皮（1-3 年）反而更搭
+老陈皮的药香太沉，会盖住夏茶本身的茶香
+
+📌 一句话总结
+喝茶要"顺天气"
+立夏前要鲜，立夏后要爽
+水温和出汤一调，夏茶也能很好喝
+
+🏷 你们立夏后还喝春茶吗？评论区聊聊`,
+    tags: ["#立夏", "#夏茶", "#贵州茶", "#陈皮茶", "#雷公山", "#都匀毛尖", "#节气生活", "#贵州伴手礼", "#慢时光", "#茶生活"],
+    images: [
+      { ratio: "r23", label: "P1 封面", prompt: "阳台木茶盘｜远景贵州雾山绿｜玻璃壶琥珀茶 + 两只小白瓷｜陈皮 + 白餐巾｜午后暖" },
+      { ratio: "r23", label: "P2 春茶 vs 夏茶", prompt: "亚麻拼板｜左：嫩绿春茶；右：稍深成熟夏茶｜手写「春茶」「夏茶」标签" },
+      { ratio: "r23", label: "P3 水温", prompt: "玻璃水壶冒蒸气｜温度计 85℃｜空白茶杯待泡｜厨房暖光、不冷峻" },
+      { ratio: "r23", label: "P4 出汤", prompt: "动态：玻璃壶向白瓷杯倾倒琥珀茶｜手表在旁约 15 秒｜微动模糊" },
+      { ratio: "r23", label: "P5 配陈皮", prompt: "俯拍｜两只小碟｜深陈皮 vs 嫩陈皮｜各配相应茶杯｜暖窗光" }
+    ]
+  },
+  {
+    id: 15, cat: "节令",
+    title: "5/5 立夏，贵州餐桌必有的 3 样\"夏味\"",
+    coverRatio: "r11", coverPrompt: "折耳根 + 酸汤鱼 + 茄子｜立夏餐桌仪式",
+    likes: "拟 220+",
+    body: `立夏（5/5）这一天
+贵州人餐桌上有 3 样东西必须出现
+不上这 3 样，等于没过立夏 👇
+
+🌿 第 1 样：折耳根
+贵州人对折耳根的爱，外地人理解不了
+立夏这天的折耳根是凉拌的
+做法：折耳根洗净撕成段
+辣椒面 + 蒜末 + 醋 + 一点白糖 + 香菜
+拌匀，最后浇一勺烧到滚烫的菜籽油
+"刺啦"一声响是这道菜的灵魂
+立夏吃折耳根 = 清热 + 开胃
+
+⚠️ 重点：折耳根不是鱼腥草根，是它的嫩茎叶部分
+不爱的人觉得有股土味
+爱的人觉得这就是贵州的春末
+
+🐟 第 2 样：酸汤夏鱼
+贵州的酸汤分两种
+- 红酸汤：番茄发酵，颜色橘红，酸里带甜
+- 白酸汤：米汤发酵，颜色乳白，纯粹的酸
+立夏当天吃鱼很多地方都有讲究
+但贵州人会用酸汤煮——红酸汤煮"夏鱼"是经典
+夏鱼 = 立夏前后从清水河捞的小鱼
+（雷山 / 凯里 / 都匀都有）
+
+做法快：酸汤烧开，丢鱼进去煮 5 分钟
+出锅前撒点折耳根（又是它）
+酸 + 鲜 + 辣，一碗下去出汗
+"立夏喝酸汤，三伏不中暑"
+
+🍆 第 3 样：茄子
+贵州人立夏吃茄子有讲究
+要选当天买的"嫩紫茄"
+做法：长条切，过油炸到外焦
+然后回锅炒：蒜末 + 辣椒 + 一勺醋
+最后撒葱花
+立夏吃茄子 = 一年不长疮（贵州老人的说法）
+
+📌 一句话总结
+立夏的贵州餐桌
+是折耳根的爽 + 酸汤的鲜 + 茄子的香
+配一杯陈皮凉茶或者一支细支烟收尾
+就是这一天的仪式感
+
+🏷 你们立夏吃什么？评论区分享～`,
+    tags: ["#立夏", "#贵州美食", "#折耳根", "#酸汤鱼", "#节气生活", "#贵州伴手礼", "#黔东南", "#雷山", "#都匀"],
+    images: [
+      { ratio: "r11", label: "P1 封面", prompt: "木桌俯拍｜三个朴拙瓷盘成三角｜凉拌折耳根 + 酸汤鱼陶钵 + 炒茄子｜竹筷、醋瓶、牛皮纸巾" },
+      { ratio: "r11", label: "P2 折耳根", prompt: "白盘特写｜凉拌折耳根 + 红辣椒粉 + 蒜｜热油刚浇微蒸汽｜竹筷搁盘边" },
+      { ratio: "r11", label: "P3 酸汤夏鱼", prompt: "陶钵红酸汤 + 小河鱼漂浮 + 香菜折耳根点缀｜柔暖光，乡村家厨感" },
+      { ratio: "r11", label: "P4 茄子", prompt: "瓷盘紫茄长条 + 蒜辣椒｜旁碗白米饭虚化｜不油腻不商业" },
+      { ratio: "r11", label: "P5 餐桌全景", prompt: "俯拍小木桌单人餐｜三道菜 + 米饭 + 凉茶｜烟盒一角（不正面）｜窗光、慵懒午餐" }
+    ]
+  },
+  {
+    id: 17, cat: "节令",
+    title: "5 月贵州人都在收什么？4 样春末夏初的物产",
+    coverRatio: "r11", coverPrompt: "春茶尾道 + 春蜜 + 雷笋 + 陈皮｜过渡月伴手礼",
+    likes: "拟 180+",
+    body: `5 月是贵州的"过渡月"
+山里 / 田里 / 厨房里都在"收"
+4 样春末夏初的物产，挺值得带回家的 👇
+
+🍃 第 1 样：春茶最后一道
+雷公山的春茶 / 都匀毛尖
+4 月底到 5 月头是"春茶尾道"
+价格比清明茶低，但叶子更厚实，耐泡度高
+适合：自己喝、送长辈、当贵州伴手礼
+保存：买回去先在玻璃罐里"透"3 天再封口
+
+🍯 第 2 样：春蜜
+槐花 / 油菜花蜜，5 月中下旬是采收期
+贵州山区的春蜜没有商业蜜的甜腻
+是淡淡的花香 + 一点点酸
+最简单的检验方法：滴一滴在白纸上，不晕开 = 真蜜
+可以直接吃，也可以泡水
+推荐：黔西北的乌蒙山蜜
+
+🌱 第 3 样：雷笋（最后一茬）
+雷笋是 5 月最早冒出来的笋
+立夏前后是最后一茬，过了就老了
+贵州黔东南、铜仁山里都有
+处理方法：买回去先泡 1 小时去涩
+然后切片冷冻，可以保存 3 个月
+做法：焖肉 / 炒腊肉 / 凉拌
+
+🍊 第 4 样：陈皮（去年晒的入罐）
+这一样不是"收"，是"封存"
+去年 10-12 月晒的陈皮，到 5 月正好满半年
+要装进玻璃罐里封口
+之后每年舀一次，用一年存一年
+（贵烟魔力 / 跨越里的陈皮爆珠
+就是这种自然陈化的新会陈皮）
+
+📌 一句话总结
+贵州的 5 月
+是春茶的尾、春蜜的甜、雷笋的脆、陈皮的封
+4 样东西配一桌饭 + 一杯茶
+就是当地人的"伴手礼"清单
+
+🏷 你想要哪一样？评论区告诉我～`,
+    tags: ["#贵州伴手礼", "#春茶", "#雷公山", "#都匀毛尖", "#雷笋", "#新会陈皮", "#节气生活", "#黔东南", "#贵阳", "#贵州物产"],
+    images: [
+      { ratio: "r11", label: "P1 封面", prompt: "木桌俯拍｜4 个竹托盘 2x2｜茶叶 / 浅琥珀蜂蜜罐 / 鲜雷笋 / 陈皮｜各贴牛皮纸标签｜呼吸空间" },
+      { ratio: "r11", label: "P2 春茶", prompt: "竹托盘绿茶叶（比头道更厚实）｜玻璃罐部分填 + 木勺｜窗光、家常感" },
+      { ratio: "r11", label: "P3 春蜜", prompt: "浅琥珀蜂蜜玻璃罐｜木蜜签滴蜜｜春花瓣（槐白/油菜黄）｜白纸滴蜜测试" },
+      { ratio: "r11", label: "P4 雷笋", prompt: "木砧板新鲜竹笋数支｜一支剖开露白｜简刀 + 浸泡水碗｜厨房晨光" },
+      { ratio: "r11", label: "P5 陈皮入罐", prompt: "玻璃储罐半满陈皮 + 木勺 + 麻绳标签「2025 秋晒」｜黑色烟盒一角（极轻嵌）｜储物间柔光" }
+    ]
+  },
+  {
+    id: 4, cat: "旅游",
+    title: "五一去贵州不知道带什么回？4 样老贵阳人都在送",
+    coverRatio: "r11", coverPrompt: "铜仁抹茶 + 老干妈 + 波波糖 + 贵烟｜伴手礼承接 4/27 爆款",
+    likes: "拟 350+ (承接 411 赞爆款流量)",
+    body: `4/27 写过五一贵州攻略，411 赞了，谢谢家人们🥹
+后台被问最多的：
+"那买什么伴手礼回去送人？"
+今天专门写——4 样老贵阳人自己都在送的 👇
+
+🍵 第 1 样：铜仁抹茶
+贵州铜仁是中国抹茶之都，梵净山茶区海拔高、云雾多
+出来的抹茶粉颜色翠绿、味道鲜甜不苦
+怎么挑：
+- 看颜色：越翠绿越好，发黄说明氧化了
+- 闻香气：有海苔般的鲜香 = 好抹茶
+- 看产地：认准"铜仁""梵净山"字样
+价格区间：自己喝 80-150 / 罐（30g）；送人礼盒 200-400
+保存：买回去冷藏密封，避光避热
+
+🌶 第 2 样：老干妈系列（不是经典款，是地方限定）
+老干妈在外地大家都买经典油辣椒
+但贵阳本地有几个隐藏款：
+- 风味豆豉酱（拌面神器）
+- 香辣脆（直接当零食吃）
+- 油辣椒（青色版本，比经典款清爽）
+普通超市没有，要去贵阳本地老干妈专柜或者菜场
+预算：30-50/瓶
+
+🍬 第 3 样：镇宁波波糖 / 六枝特糕
+贵州两个小众甜味地方礼
+- 镇宁波波糖：芝麻+花生+麦芽糖手工做的
+  特点：薄脆、不腻、入口即化
+- 六枝特糕：糯米粉+桂花+猪油
+  特点：软糯、桂花香突出
+两个都是手工的，保质期短（30 天左右），趁鲜吃
+预算：20-40/盒
+
+🚬 第 4 样：贵烟系列（成年人之间的伴手礼）
+说回我们「烟火有味」的本行
+贵烟在贵州是最常见的伴手礼烟
+- 贵烟（魔力）：陈皮爆珠，适合送懂烟 + 懂陈皮的朋友
+- 贵烟（跨越）：黑盒星芒，包装好看，适合送男士
+建议：搭配一盒铜仁抹茶一起送，"茶+烟"是贵州送礼的经典组合
+
+⚠️ 红线：买烟一定要在正规渠道
+路边摊别买，避免假烟
+
+📌 一句话总结
+贵州的伴手礼不在景区
+在菜场、在茶店、在烟酒铺里
+4 样组合送人，体面又有心意
+
+🏷 你最想要哪个？评论区告诉我～`,
+    tags: ["#贵州伴手礼", "#五一旅游", "#铜仁抹茶", "#老干妈", "#镇宁波波糖", "#贵烟", "#贵阳", "#贵州特产"],
+    images: [
+      { ratio: "r11", label: "P1 封面", prompt: "亚麻俯拍 4 件 2x2｜抹茶罐 / 辣酱罐 / 竹盒糖 / 黑色烟盒（仅一角）｜各小牛皮标签｜窗光" },
+      { ratio: "r11", label: "P2 铜仁抹茶", prompt: "翠绿抹茶粉小罐 + 竹茶筅 + 白瓷碗抹茶汤｜木勺、散抹茶粉｜柔光不商业" },
+      { ratio: "r11", label: "P3 老干妈系列", prompt: "三只小辣酱罐排开（标签不必清晰）｜面碗加酱、竹筷｜暖红橙调" },
+      { ratio: "r11", label: "P4 波波糖/特糕", prompt: "竹盒打开亚麻布上｜手工层叠糖块（芝麻脆 + 米糕）｜瓷杯茶｜柔光" },
+      { ratio: "r11", label: "P5 礼盒组合", prompt: "纵向木桌｜抹茶罐 + 贵烟跨越黑色烟盒（侧面）红绳系起｜手写「贵州伴手礼」吊牌" }
+    ]
+  },
+  {
+    id: 18, cat: "旅游",
+    title: "五一去贵阳，本地人才知道的 4 个\"非攻略\"角落",
+    coverRatio: "r11", coverPrompt: "茶馆 + 步道 + 菜场 + 村落｜反向旅游",
+    likes: "拟 300+ (承接 4/27 爆款)",
+    body: `上次的五一攻略爆了，411 赞 🥹
+但攻略写的是黄果树/镇远/西江这些大景点
+评论区都在问：
+"贵阳市里有没有不挤的角落？"
+今天给 4 个本地人才知道的——👇
+
+📍 第 1 个：文昌阁的"老张茶馆"
+不是网红那家
+是文昌阁背面巷子里的老张茶馆
+老板姓张，70 多岁，茶 5 块一壶（自带茶叶可以续水）
+一壶茶坐一下午，老人们打牌、聊天、晒太阳
+氛围：老贵阳的"慢"，比观山湖那些咖啡馆真实 100 倍
+导航：搜"文昌阁" → 走背面巷子
+
+📍 第 2 个：黔灵山的"本地人步道"
+大多数人去黔灵山是从大门进，走主道看猴子
+本地人走的是"东门—瞰筑亭"的支路
+3 公里左右，没有商业摊位
+路边都是 70 年代的老石阶
+山顶能看到整个贵阳的山势
+建议：早上 7 点去，下午 4 点之前出来
+注意：山里湿气重，穿防滑鞋
+
+📍 第 3 个：二七路的老菜场
+不是头桥那个网红菜场
+是二七路那条"早市菜场"
+早 6 点开始，到 9 点就散
+卖菜的都是周边山里来的农民
+能买到山里的雷笋、野菌、正宗折耳根
+逛菜场就是看当地人的真实生活
+适合：早起的早 / 想拍菜场题材的朋友
+不适合：怕拥挤的姐妹（早上 7-8 点最挤）
+
+📍 第 4 个：花溪的"龙井村"
+不是大寨花溪
+是花溪上游的龙井村，离市区 30 分钟
+村里有几条溪流，有水车，有老石桥
+最适合的事：找一个农家院吃饭
+本地人去那里都是"找一家不在攻略里的农家院"
+推荐菜：腊肉炒蕨菜 / 折耳根炒鸡蛋 / 酸汤夏鱼
+预算：人均 60-80
+
+📌 一句话总结
+五一的贵阳市
+小景点比大景点更"贵阳"
+菜场比咖啡馆更"本地"
+老茶馆比网红馆更"慢时光"
+
+🏷 这 4 个你最想去哪个？`,
+    tags: ["#五一旅游", "#贵阳旅游", "#贵阳本地人", "#黔灵山", "#花溪", "#文昌阁", "#贵州伴手礼", "#小众旅行", "#反向旅游", "#贵阳菜场"],
+    images: [
+      { ratio: "r11", label: "P1 封面", prompt: "纵向 4 格｜左上：老茶馆巷子；右上：雾山步道老石阶；左下：清晨菜场；右下：村中溪木桥｜各格手写编号" },
+      { ratio: "r11", label: "P2 老张茶馆", prompt: "老贵州茶馆内宽景｜旧木桌 + 老人打牌 + 玻璃茶杯绿茶｜木百叶午后柔光｜蒸气" },
+      { ratio: "r11", label: "P3 黔灵山步道", prompt: "黔灵山雾林老石阶 + 苔藓 + 树叶滤光｜无行人 + 木手杖靠石｜清晨" },
+      { ratio: "r11", label: "P4 菜场", prompt: "清晨贵州菜场｜木箱雷笋、野菌、折耳根｜远处摊主虚化｜真实街市，不过度饱和" },
+      { ratio: "r11", label: "P5 龙井村", prompt: "贵州小村｜石桥溪流 + 老木水车 + 灰瓦顶｜手绘农家院招牌｜傍晚暖光" }
+    ]
+  },
+  {
+    id: 19, cat: "旅游",
+    title: "5 月去贵州山里，4 个不出名但好走的山",
+    coverRatio: "r23", coverPrompt: "雷公山 + 月亮山 + 梵净小路 + 麻江茶山｜小众反向",
+    likes: "拟 280+ (承接 4/27 爆款)",
+    body: `五一前后是贵州去山里最好的时候
+气温 22℃，山里湿润但不闷
+但很多人只知道梵净山 / 黄果树
+这 4 座小山，本地人 5 月才去——👇
+
+⛰ 第 1 座：雷公山（支线）
+位置：黔东南雷山县
+难度：⭐⭐
+亮点：有"东方阿尔卑斯"的雾林
+不要走主峰，走"格头—白岩村"支线
+3 公里下坡，沿溪而行
+路边有野茶、有山泉、有老苗寨
+推荐：上午到，下午原路返回，住山下苗寨
+
+⛰ 第 2 座：月亮山（从江）
+位置：黔东南从江县
+难度：⭐
+亮点：山里的"梯田 + 水牛"画面
+适合不爱爬山的姐妹
+最高处 1500m，但有公路直达 1300m
+然后步行 30 分钟到观景台
+能看到 10 多层梯田 + 远处水牛在水田里
+摄影爱好者必去
+
+⛰ 第 3 座：梵净山的"小路"
+位置：铜仁市江口县
+难度：⭐⭐⭐
+亮点：避开主峰人潮
+不要从西线主峰上
+走北线"棉絮岭—蘑菇石"
+比主峰人少 80%，但景观一样好
+注意：这条线没有缆车，全程步行 8 公里
+
+⛰ 第 4 座：麻江下司的茶山
+位置：黔东南麻江县
+难度：⭐
+亮点：5 月正是采春茶尾道的时候
+山不高（800m），但茶园一片连一片
+能跟着老茶农一起摘茶
+最后做的茶可以带走
+（这是我自己最喜欢的一个）
+
+📌 一句话总结
+贵州山多
+但好的山从来不在攻略首页
+4 座小山，5 月最适合
+配一壶都匀毛尖 + 一支细支烟
+就是 5 月最贵州的样子
+
+🏷 你想去哪一座？`,
+    tags: ["#贵州旅游", "#雷公山", "#月亮山", "#梵净山", "#贵州小众", "#反向旅游", "#五一旅游", "#黔东南", "#贵州伴手礼", "#小众山"],
+    images: [
+      { ratio: "r23", label: "P1 封面", prompt: "纵向贵州雾梯山｜层叠绿坡渐隐晨雾｜小路蜿蜒、单徒步剪影右下角｜不奇幻" },
+      { ratio: "r23", label: "P2 雷公山支线", prompt: "雷公山雾林步道｜高树苔藓 + 路边小溪｜柔光过叶、木手杖靠石" },
+      { ratio: "r23", label: "P3 月亮山梯田", prompt: "层叠梯田水田映天｜远处水牛｜傍晚金光｜呼吸感" },
+      { ratio: "r23", label: "P4 梵净小路", prompt: "梵净北线非主峰路｜岩石矮灌 + 云海低于视平｜远处独特石形（暗示蘑菇石）" },
+      { ratio: "r23", label: "P5 麻江茶山", prompt: "麻江茶园纵景｜起伏茶丛 + 老茶农背影摘茶入竹篓｜晨雾柔光、远处木屋" }
+    ]
+  }
+];
+
+// ----- Render feed -----
+const feed = document.getElementById("feed");
+POSTS.forEach((post, idx) => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.onclick = () => openModal(idx);
+  const padId = String(post.id).padStart(2, '0');
+  card.innerHTML = `
+    <div class="cover ${post.coverRatio}" data-cat="${post.cat}">
+      <img class="real-img" src="imgs/post${padId}_p1.png" onload="this.classList.add('loaded')" onerror="this.remove()">
+      <span class="cat-tag">${post.cat}</span>
+      <span class="ratio-tag">${post.coverRatio === 'r23' ? '2:3' : post.coverRatio === 'r32' ? '3:2' : '1:1'}</span>
+      <div class="placeholder-text">${post.coverPrompt}</div>
+    </div>
+    <div class="card-body">
+      <div class="card-title">${post.title}</div>
+      <div class="card-foot">
+        <div class="card-author">
+          <div class="mini-ava"></div>
+          <span>烟火有味</span>
+        </div>
+        <div class="card-likes">❤️ ${post.likes}</div>
+      </div>
+    </div>
+  `;
+  feed.appendChild(card);
+});
+
+// ----- Modal logic -----
+let currentPost = null;
+let currentSlide = 0;
+
+function openModal(idx) {
+  currentPost = POSTS[idx];
+  currentSlide = 0;
+  renderModal();
+  document.getElementById("modal").classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+function closeModal() {
+  document.getElementById("modal").classList.remove("show");
+  document.body.style.overflow = "";
+}
+function navSlide(dir) {
+  if (!currentPost) return;
+  const n = currentPost.images.length;
+  currentSlide = Math.max(0, Math.min(n - 1, currentSlide + dir));
+  updateSlides();
+}
+
+function renderModal() {
+  const p = currentPost;
+  // notice
+  const notice = document.getElementById("notice");
+  if (p.notice) {
+    notice.style.display = "block";
+    notice.textContent = p.notice;
+  } else {
+    notice.style.display = "none";
+  }
+
+  document.getElementById("dTitle").textContent = p.title;
+  document.getElementById("dBody").textContent = p.body;
+
+  const tagsEl = document.getElementById("dTags");
+  tagsEl.innerHTML = p.tags.map(t => `<span class="tag">${t}</span>`).join("");
+
+  const meta = document.getElementById("dMeta");
+  meta.innerHTML = `
+    <span>📌 类别：<b>${p.cat}</b></span>
+    <span>🖼 共 ${p.images.length} 张图</span>
+    <span>❤️ 预期 ${p.likes}</span>
+  `;
+
+  // slides
+  const cont = document.getElementById("slidesContainer");
+  const padId = String(p.id).padStart(2, '0');
+  cont.innerHTML = p.images.map((img, i) => `
+    <div class="slide ${i === 0 ? 'active' : ''}" data-idx="${i}">
+      <div class="slide-inner ${img.ratio}" data-cat="${p.cat}">
+        <img class="real-img" src="imgs/post${padId}_p${i + 1}.png" onload="this.classList.add('loaded')" onerror="this.remove()">
+        <span class="slide-label">${img.label}</span>
+        <span class="slide-ratio-label">${img.ratio === 'r23' ? '2:3' : img.ratio === 'r32' ? '3:2' : '1:1'}</span>
+        <div class="slide-prompt">${img.prompt}</div>
+      </div>
+    </div>
+  `).join("");
+
+  const dots = document.getElementById("dots");
+  dots.innerHTML = p.images.map((_, i) => `<span class="dot ${i === 0 ? 'active' : ''}" onclick="jumpSlide(${i})"></span>`).join("");
+
+  updateSlides();
+  renderComments();
+}
+
+function jumpSlide(i) {
+  currentSlide = i;
+  updateSlides();
+}
+
+function updateSlides() {
+  const n = currentPost.images.length;
+  document.querySelectorAll(".slide").forEach((s, i) => {
+    s.classList.toggle("active", i === currentSlide);
+  });
+  document.querySelectorAll(".dot").forEach((d, i) => {
+    d.classList.toggle("active", i === currentSlide);
+  });
+  document.getElementById("prevBtn").disabled = currentSlide === 0;
+  document.getElementById("nextBtn").disabled = currentSlide === n - 1;
+}
+
+document.getElementById("modal").addEventListener("click", (e) => {
+  if (e.target.id === "modal") closeModal();
+});
+document.addEventListener("keydown", (e) => {
+  if (!document.getElementById("modal").classList.contains("show")) return;
+  if (e.key === "Escape") closeModal();
+  if (e.key === "ArrowLeft") navSlide(-1);
+  if (e.key === "ArrowRight") navSlide(1);
+});
+
+// ---------- Comments (localStorage) ----------
+function getComments(postId) {
+  const all = JSON.parse(localStorage.getItem('guiyan_comments') || '{}');
+  return all[postId] || [];
+}
+function saveComments(postId, comments) {
+  const all = JSON.parse(localStorage.getItem('guiyan_comments') || '{}');
+  all[postId] = comments;
+  localStorage.setItem('guiyan_comments', JSON.stringify(all));
+}
+function renderComments() {
+  const list = document.getElementById('commentList');
+  const comments = getComments(currentPost.id);
+  list.innerHTML = comments.map((c, i) => `
+    <div class="comment-item">
+      <button class="comment-delete" onclick="deleteComment(${i})">×</button>
+      <div>${c.text}</div>
+      <div class="comment-time">${c.time}</div>
+    </div>
+  `).join('') || '<div style="font-size:12px;color:#bbb;padding:4px 0;">暂无备注</div>';
+}
+function addComment() {
+  const input = document.getElementById('commentInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const comments = getComments(currentPost.id);
+  comments.push({ text, time: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }) });
+  saveComments(currentPost.id, comments);
+  input.value = '';
+  renderComments();
+  syncCommentsToFile();
+}
+document.getElementById('commentInput').addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); addComment(); }
+});
+function deleteComment(idx) {
+  const comments = getComments(currentPost.id);
+  comments.splice(idx, 1);
+  saveComments(currentPost.id, comments);
+  renderComments();
+  syncCommentsToFile();
+}
+function exportComments() {
+  const all = JSON.parse(localStorage.getItem('guiyan_comments') || '{}');
+  let text = '# 12篇预览 — 审稿备注\n\n';
+  let hasAny = false;
+  POSTS.forEach(p => {
+    const comments = all[p.id];
+    if (comments && comments.length) {
+      hasAny = true;
+      text += `## Post ${p.id}: ${p.title}\n`;
+      comments.forEach(c => { text += `- ${c.text}  (${c.time})\n`; });
+      text += '\n';
+    }
+  });
+  if (!hasAny) { alert('还没有任何备注'); return; }
+  const blob = new Blob([text], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '审稿备注.md'; a.click();
+  URL.revokeObjectURL(url);
+}
+function syncCommentsToFile() {
+  const all = JSON.parse(localStorage.getItem('guiyan_comments') || '{}');
+  const output = {};
+  POSTS.forEach(p => {
+    const comments = all[p.id];
+    if (comments && comments.length) {
+      output[p.id] = { title: p.title, comments };
+    }
+  });
+  fetch('/save-comments', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(output)
+  }).catch(() => {});
+}
+syncCommentsToFile();
+</script>
+</body>
+</html>
